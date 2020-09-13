@@ -28,6 +28,19 @@ char *substring(char *string, int position, int length) {
 	return pointer;
 }
 
+char *nlnrem(char *str) {
+	if (str == NULL) {
+		exit(1);
+	}
+	int length = strlen(str);
+	int pos[length+1];
+	if (str[pos-1] == '\n') {
+		str[pos-1]  = '\0';
+		pos = pos-1;
+	}
+	return str;
+}
+
 char *fileopen(char *file) {
         FILE *filePointer ;
         char dataToBeRead[5002];
@@ -60,11 +73,11 @@ int os() {
                 exit(EXIT_FAILURE);
         }
 
-        char *result =  fileopen("/usr/lib/os-release");
+        char *result =  nlnrem(fileopen("/usr/lib/os-release"));
         char *out = (result+ strlen(result)- 251);
         char *os[50];
         strncpy((void *) os, out, 11);
-        char *architecture = (utbuffer.machine);
+        char *architecture = nlnrem((utbuffer.machine));
         printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat((void *)os, " ")), architecture));
 }
 
