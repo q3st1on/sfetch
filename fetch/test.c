@@ -28,6 +28,7 @@ char *substring(char *string, int position, int length) {
 	return pointer;
 }
 
+/*
 char *nlnrem(char *str) {
 	if (str == NULL) {
 		exit(1);
@@ -40,7 +41,7 @@ char *nlnrem(char *str) {
 	}
 	return str;
 }
-
+*/
 char *fileopen(char *file) {
         FILE *filePointer ;
         char dataToBeRead[5002];
@@ -73,18 +74,35 @@ int os() {
                 exit(EXIT_FAILURE);
         }
 
-        char *result =  nlnrem(fileopen("/usr/lib/os-release"));
+        char *result =  fileopen("/usr/lib/os-release");
         char *out = (result+ strlen(result)- 251);
         char *os[50];
         strncpy((void *) os, out, 11);
-        char *architecture = nlnrem((utbuffer.machine));
+        char *architecture = (utbuffer.machine);
         printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat((void *)os, " ")), architecture));
 }
 
 int model() {
-        char *name = fileopen("/sys/devices/virtual/dmi/id/product_name");
-	char *version = fileopen("/sys/devices/virtual/dmi/id/product_version");
-        printf("\e[36;1m Host\e[m: %s\n", strcat((void *) name, (void *) version));
+        char *nameold = fileopen("/sys/devices/virtual/dmi/id/product_name");
+	char *name[strlen(nameold)];
+	strncpy((void *) name, nameold, 14);
+	char *versionold = fileopen("/sys/devices/virtual/dmi/id/product_version");
+        char *version[strlen(versionold)];
+	strncpy((void *) version, versionold, 45);
+	printf("\e[36;1m Host\e[m: %s\n", strcat(strcat((void *) name, " "), (void *) version));
+}
+
+int Kernel() {
+        struct utsname utbuffer;
+        errno = 0;
+
+
+        if (uname(&utbuffer) != 0) {
+                perror("uname");
+                exit(EXIT_FAILURE);
+        }
+
+printf("\e[36;1m Kernel\e[m: %s\n", utbuffer.release);
 }
 int main(void) {
 /*	printf("system name = %s\n", utbuffer.sysname);
@@ -95,6 +113,7 @@ int main(void) {
 */
 	os();
 	model();
+	Kernel();
 	return EXIT_SUCCESS;
 
 }
