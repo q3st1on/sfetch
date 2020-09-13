@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <dirent.h>
 #include <sys/utsname.h>
+#include <linux/kernel.h>
+#include <sys/sysinfo.h>
 #define _POSIX_C_SOURCE 200809L
 #define chunk 1024
 
@@ -102,8 +105,32 @@ int Kernel() {
                 exit(EXIT_FAILURE);
         }
 
-printf("\e[36;1m Kernel\e[m: %s\n", utbuffer.release);
+	printf("\e[36;1m Kernel\e[m: %s\n", utbuffer.release);
 }
+
+int uptime() {
+	struct sysinfo s_info;
+	int error = sysinfo(&s_info);
+	if(error != 0) {
+		printf("code error = %d\n", error);
+	}
+	printf("\e[36;1m Uptime\e[m: %d %s\n", (s_info.uptime / 60), "mins");
+}
+
+int packages() {
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(".");
+
+	if (d) {
+		while ((dir = readdir(d)) != NULL) {
+			printf("%s\n", dir->d_name);
+		}
+		closedir(d);
+	}
+	return(0);
+}
+
 int main(void) {
 /*	printf("system name = %s\n", utbuffer.sysname);
 	printf("node name= %s\n", utbuffer.nodename);
@@ -114,6 +141,7 @@ int main(void) {
 	os();
 	model();
 	Kernel();
+	uptime();
 	return EXIT_SUCCESS;
 
 }
