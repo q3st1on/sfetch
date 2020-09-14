@@ -32,7 +32,7 @@ char *substring(char *string, int position, int length) {
 	free(pointer);
 }
 
-char fileparse(char *file, int reqline[]) {
+char *fileparse(char *file, int reqline, char *delim) {
 	FILE* fp = fopen(file, "r");
 	if(fp == NULL) {
 		printf("fopen failed to open the file\n");
@@ -40,15 +40,19 @@ char fileparse(char *file, int reqline[]) {
 	}
 	char line[2048];
 	char itemCode[50];
-	char item[50];
+	char *item;
+	item = malloc(50);
+	int lineno;
+	lineno = 0;
 	while(fgets(line, sizeof(line), fp) != NULL) {
-		if(sscanf(line, "%*[^\"]\"%127[^\"]", item) != 1) {
+		if(sscanf(line, ("%*[^\"]\"%127[^\"]"), item) != 1) {
 			exit;
 		}
-		if((int *) line == reqline) {
-			fclose(fp);
-			return *item;
+		if(lineno == reqline) {
+			sscanf(line, ("%*[^\"]\"%127[^\"]"), item);
+			return item;
 		}
+		lineno++;
 	}
 	fclose(fp);
 }
@@ -86,18 +90,20 @@ int os() {
                 exit(EXIT_FAILURE);
         }
 
-        char result =  fileparse("/usr/lib/os-release", 1);
+        char *result =  fileparse("/usr/lib/os-release", 1, "\"");
         char *architecture = (utbuffer.machine);
-        printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat(result, " ")), architecture));
+        printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat((void *) result, " ")), architecture));
 }
 
 int model() {
-        char *nameold = fileopen("/sys/devices/virtual/dmi/id/product_name");
-	char *name[strlen(nameold)];
-	strncpy((void *) name, nameold, 14);
-	char *versionold = fileopen("/sys/devices/virtual/dmi/id/product_version");
-        char *version[strlen(versionold)];
-	strncpy((void *) version, versionold, 45);
+        char *name = fileopen("/sys/devices/virtual/dmi/id/product_name");
+	char *temp;
+	temp = strchr(name,'\n');
+	*temp = '\0';
+	char *version = fileopen("/sys/devices/virtual/dmi/id/product_version");
+        char *vtemp;
+        vtemp = strchr(version,'\n');
+        *vtemp = '\0';
 	printf("\e[36;1m Host\e[m: %s\n", strcat(strcat((void *) name, " "), (void *) version));
 }
 
