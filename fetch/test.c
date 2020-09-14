@@ -29,6 +29,7 @@ char *substring(char *string, int position, int length) {
 	*(pointer+c) = '\0';
 
 	return pointer;
+	free(pointer);
 }
 
 /*
@@ -65,6 +66,7 @@ char *fileopen(char *file) {
                 fclose(filePointer);
         }
 	return result;
+	free(result);
 }
 
 int os() {
@@ -120,17 +122,23 @@ int uptime() {
 int packages() {
 	DIR *d;
 	struct dirent *dir;
-	d = opendir(".");
-
+	d = opendir("/var/cache/pacman/pkg");
+	int files = 0;
 	if (d) {
 		while ((dir = readdir(d)) != NULL) {
-			printf("%s\n", dir->d_name);
+			files++;
 		}
 		closedir(d);
 	}
-	return(0);
+	int packnum = (files - 2);
+	printf("\e[36;1m Packages\e[m: %d %s\n", packnum, "(pacman)");
 }
-
+/*
+int shell() {
+	printf("%s\n", getpwuid(geteuid())->pw_shell);
+	return 0;
+}
+*/
 int main(void) {
 /*	printf("system name = %s\n", utbuffer.sysname);
 	printf("node name= %s\n", utbuffer.nodename);
@@ -142,6 +150,7 @@ int main(void) {
 	model();
 	Kernel();
 	uptime();
+	packages();
 	return EXIT_SUCCESS;
 
 }
