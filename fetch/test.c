@@ -32,20 +32,27 @@ char *substring(char *string, int position, int length) {
 	free(pointer);
 }
 
-/*
-char *nlnrem(char *str) {
-	if (str == NULL) {
-		exit(1);
+char fileparse(char *file, int reqline[]) {
+	FILE* fp = fopen(file, "r");
+	if(fp == NULL) {
+		printf("fopen failed to open the file\n");
+		exit(-1);
 	}
-	int length = strlen(str);
-	int pos[length+1];
-	if (str[pos-1] == '\n') {
-		str[pos-1]  = '\0';
-		pos = pos-1;
+	char line[2048];
+	char itemCode[50];
+	char item[50];
+	while(fgets(line, sizeof(line), fp) != NULL) {
+		if(sscanf(line, "%*[^\"]\"%127[^\"]", item) != 1) {
+			exit;
+		}
+		if((int *) line == reqline) {
+			fclose(fp);
+			return *item;
+		}
 	}
-	return str;
+	fclose(fp);
 }
-*/
+
 char *fileopen(char *file) {
         FILE *filePointer ;
         char dataToBeRead[5002];
@@ -79,12 +86,9 @@ int os() {
                 exit(EXIT_FAILURE);
         }
 
-        char *result =  fileopen("/usr/lib/os-release");
-        char *out = (result+ strlen(result)- 251);
-        char *os[50];
-        strncpy((void *) os, out, 11);
+        char result =  fileparse("/usr/lib/os-release", 1);
         char *architecture = (utbuffer.machine);
-        printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat((void *)os, " ")), architecture));
+        printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat(result, " ")), architecture));
 }
 
 int model() {
@@ -133,19 +137,7 @@ int packages() {
 	int packnum = (files - 2);
 	printf("\e[36;1m Packages\e[m: %d %s\n", packnum, "(pacman)");
 }
-/*
-int shell() {
-	printf("%s\n", getpwuid(geteuid())->pw_shell);
-	return 0;
-}
-*/
 int main(void) {
-/*	printf("system name = %s\n", utbuffer.sysname);
-	printf("node name= %s\n", utbuffer.nodename);
-	printf("release = %s\n", utbuffer.release);
-	printf("version = %s\n", utbuffer.version);
-	printf("\n\n\n\n\n\n\n");
-*/
 	os();
 	model();
 	Kernel();
