@@ -10,31 +10,7 @@
 #define _POSIX_C_SOURCE 200809L
 #define chunk 1024
 
-//comment
-
-char *substring(char *string, int position, int length) {
-	char *pointer;
-	int c;
-
-	pointer = malloc(length+1);
-
-	if (pointer == NULL) {
-		printf("Unable to allocate memory.\n");
-		exit(1);
-	}
-
-	for (c = 0 ; c < length ; c++) {
-		*(pointer+c) = *(string+position-1);
-		string++;
-	}
-
-	*(pointer+c) = '\0';
-
-	return pointer;
-	free(pointer);
-}
-
-char *fileparse(char *file, int reqline, char *delim) {
+char *fileparse(char *file, int reqline, char *regex) {
 	FILE* fp = fopen(file, "r");
 	if(fp == NULL) {
 		printf("fopen failed to open the file\n");
@@ -47,11 +23,11 @@ char *fileparse(char *file, int reqline, char *delim) {
 	int lineno;
 	lineno = 0;
 	while(fgets(line, sizeof(line), fp) != NULL) {
-		if(sscanf(line, ("%*[^\"]\"%127[^\"]"), item) != 1) {
+		if(sscanf(line, (regex), item) != 0) {
 			exit;
 		}
 		if(lineno == reqline) {
-			sscanf(line, ("%*[^\"]\"%127[^\"]"), item);
+			sscanf(line, regex, item);
 			return item;
 		}
 		lineno++;
@@ -92,7 +68,7 @@ int os() {
                 exit(EXIT_FAILURE);
         }
 
-        char *result =  fileparse("/usr/lib/os-release", 1, "\"");
+        char *result =  fileparse("/usr/lib/os-release", 1, "%*[^\"]\"%127[^\"]");
         char *architecture = (utbuffer.machine);
         printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat((void *) result, " ")), architecture));
 }
@@ -148,22 +124,8 @@ int packages() {
 
 
 int cpu() {
-	int lineNumber = 4;
-	FILE *cpufile = fopen("/proc/cpuinfo", "r");
-	int count = 0;
-	if ( cpufile != NULL ) {
-		char line[256];
-		while (fgets(line, sizeof line, cpufile) != NULL) {
-			if (count == lineNumber) {
-				printf("\\e[36;1m Packages\e[m: %d %s\n", line);
-				fclose(cpufile);
-			}
-			else {
-				count++;
-			}
-		}
-	}
-	fclose(cpufile);
+	char* file = fileparse("/proc/cpuinfo", 4, "%*[^:]:%[^\n]");
+	printf("\e[36;1m CPU\e[m: %s\n", file);
 	return(0);
 }
 
@@ -178,5 +140,4 @@ int main(void) {
 	packages();
 	cpu();
 	return EXIT_SUCCESS;
-
 }
