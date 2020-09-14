@@ -10,6 +10,8 @@
 #define _POSIX_C_SOURCE 200809L
 #define chunk 1024
 
+//comment
+
 char *substring(char *string, int position, int length) {
 	char *pointer;
 	int c;
