@@ -75,7 +75,7 @@ char *fileopen(char *file) {
 	return result;
 	free(result);
 }
-
+/*
 int os() {
         struct utsname utbuffer;
         errno = 0;
@@ -90,7 +90,7 @@ int os() {
         char *architecture = (utbuffer.machine);
         printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat(result, " ")), architecture));
 }
-
+*/
 int model() {
         char *nameold = fileopen("/sys/devices/virtual/dmi/id/product_name");
 	char *name[strlen(nameold)];
@@ -136,14 +136,49 @@ int packages() {
 	}
 	int packnum = (files - 2);
 	printf("\e[36;1m Packages\e[m: %d %s\n", packnum, "(pacman)");
+	
+	
 }
+
+/* Need to format properly to suckless standards */
+
+int cpu() {
+   
+    int lineNumber = 4;
+    FILE *cpufile = fopen("/proc/cpuinfo", "r");
+    int count = 0;
+
+    if ( cpufile != NULL )
+    {   
+        char line[256]; 
+        while (fgets(line, sizeof line, cpufile) != NULL)
+           
+            if (count == lineNumber)
+            {   
+                
+            printf("\n%s ", line);
+            fclose(cpufile);
+
+            }   
+            else
+            {   
+                count++;
+            }   
+        }   
+        fclose(cpufile);
+        return(0);
+}
+
+
+
+
 int main(void) {
-	os();
+/*	os(); */
 	model();
 	Kernel();
 	uptime();
 	packages();
+	cpu();
 	return EXIT_SUCCESS;
 
 }
-
