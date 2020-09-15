@@ -1,3 +1,5 @@
+#include <pwd.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -193,6 +195,12 @@ int term() {
 	return(0);
 }
 
+int shell() {
+printf("%s\n", getpwuid(geteuid())->pw_shell);
+
+return(0);
+}
+
 
 int main(void) {
 	header();
@@ -205,5 +213,6 @@ int main(void) {
 	cpu();
 	term();
 	memory();
+    shell();
 	return EXIT_SUCCESS;
 }
