@@ -4,6 +4,7 @@
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
+#include <X11/extensions/Xrandr.h>
 #include <sys/utsname.h>
 #include <linux/kernel.h>
 #include <sys/sysinfo.h>
@@ -104,7 +105,24 @@ int uptime() {
 	if(error != 0) {
 		printf("code error = %d\n", error);
 	}
-	printf("\e[36;1m Uptime\e[m: %d %s\n", (s_info.uptime / 60), "mins");
+	int time = (s_info.uptime / 60);
+        char result[256];
+	if(time >= 60) {
+		int hourcount = 0;
+		while(time >=60) {
+			time = time-60;
+			hourcount++;
+		}
+		char hours[50];
+		char mins[50];
+		sprintf(hours, "%d hours, ", hourcount);
+		sprintf(mins, "%d mins", time);
+		sprintf(result, strcat(hours, mins));
+	}
+	else {
+		sprintf(result, "%d MIN", time);
+	}
+	printf("\e[36;1m Uptime\e[m: %s\n", result);
 }
 
 int packages() {
@@ -129,7 +147,8 @@ int cpu() {
 	return(0);
 }
 
-
+int resolution() {
+}
 
 
 int main(void) {
