@@ -129,7 +129,12 @@ int cpu() {
 	return(0);
 }
 
+int term() {
+    printf("\e[36;1m Terminal\e[m:%s\n", getenv("TERM"));
+    return(0);
 
+
+}
 
 
 int main(void) {
@@ -139,5 +144,6 @@ int main(void) {
 	uptime();
 	packages();
 	cpu();
+    term();
 	return EXIT_SUCCESS;
 }
