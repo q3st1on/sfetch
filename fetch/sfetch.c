@@ -199,9 +199,7 @@ int term() {
 int shell() {
 	char shell[256];
 	sprintf(shell, "%s", getpwuid(geteuid())->pw_shell);
-	char *parsed;
-	sscanf(shell, "%*/bin/(\w+)", parsed);
-	printf("\e[36;1m Shell\e[m: %s\n", parsed);
+	printf("\e[36;1m Shell\e[m: %s\n", shell+strlen(shell) -(strlen(shell)-4));
 	return(0);
 }
 
