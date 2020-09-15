@@ -4,12 +4,32 @@
 #include <string.h>
 #include <errno.h>
 #include <dirent.h>
-#include <X11/extensions/Xrandr.h>
+#include <X11/Xlib.h>
 #include <sys/utsname.h>
 #include <linux/kernel.h>
 #include <sys/sysinfo.h>
+#define XLIB_ILLEGAL_ACCESS
 #define _POSIX_C_SOURCE 200809L
 #define chunk 1024
+
+
+int resolution()
+{
+	Display* pdsp = XOpenDisplay(NULL);
+	Window wid = DefaultRootWindow(pdsp);
+
+	Screen* pwnd = DefaultScreenOfDisplay(pdsp);
+	int sid = DefaultScreen(pdsp);
+
+	XWindowAttributes xwAttr;
+	XGetWindowAttributes(pdsp,wid,&xwAttr);
+
+	printf ("\e[36;1m Resolution\e[m: %dx%d\n", xwAttr.width, xwAttr.height);
+
+	XCloseDisplay( pdsp );
+
+	return 1;
+}
 
 char *fileparse(char *file, int reqline, char *regex) {
 	FILE* fp = fopen(file, "r");
@@ -105,7 +125,7 @@ int uptime() {
 	if(error != 0) {
 		printf("code error = %d\n", error);
 	}
-	int time = (s_info.uptime / 60);
+	int time = (s_info.uptime)/60;
         char result[256];
 	if(time >= 60) {
 		int hourcount = 0;
@@ -119,8 +139,11 @@ int uptime() {
 		sprintf(mins, "%d mins", time);
 		sprintf(result, strcat(hours, mins));
 	}
+	else if(time >=1) {
+		sprintf(result, "%d mins", time);
+	}
 	else {
-		sprintf(result, "%d MIN", time);
+		sprintf(result, "%d secs", (s_info.uptime));
 	}
 	printf("\e[36;1m Uptime\e[m: %s\n", result);
 }
@@ -148,7 +171,7 @@ int cpu() {
 }
 
 int term() {
-	printf("\e[36;1m Terminal\e[m:%s\n", getenv("TERM"));
+	printf("\e[36;1m Terminal\e[m: %s\n", getenv("TERM"));
 	return(0);
 }
 
@@ -159,6 +182,7 @@ int main(void) {
 	Kernel();
 	uptime();
 	packages();
+	resolution();
 	cpu();
 	term();
 	return EXIT_SUCCESS;
