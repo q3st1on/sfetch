@@ -197,9 +197,12 @@ int term() {
 }
 
 int shell() {
-printf("%s\n", getpwuid(geteuid())->pw_shell);
-
-return(0);
+	char shell[256];
+	sprintf(shell, "%s", getpwuid(geteuid())->pw_shell);
+	char *parsed;
+	sscanf(shell, "%*/bin/(\w+)", parsed);
+	printf("\e[36;1m Shell\e[m: %s\n", parsed);
+	return(0);
 }
 
 
