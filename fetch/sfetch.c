@@ -6,37 +6,14 @@
 #include <dirent.h>
 #include <X11/Xlib.h>
 #include <sys/utsname.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <unistd.h>
 #include <linux/kernel.h>
 #include <sys/sysinfo.h>
 #define XLIB_ILLEGAL_ACCESS
 #define _POSIX_C_SOURCE 200809L
 #define chunk 1024
-
-
-int memory() {
-	struct sysinfo s_info;
-        int error = sysinfo(&s_info);
-        if(error != 0) {
-                printf("code error = %d\n", error);
-        }
-	printf("\e[36;1m Memory\e[m: %d/%d\n", ((s_info.totalram)-(s_info.freeram)),(s_info.totalram));
-}
-int resolution() {
-	Display* pdsp = XOpenDisplay(NULL);
-	Window wid = DefaultRootWindow(pdsp);
-
-	Screen* pwnd = DefaultScreenOfDisplay(pdsp);
-	int sid = DefaultScreen(pdsp);
-
-	XWindowAttributes xwAttr;
-	XGetWindowAttributes(pdsp,wid,&xwAttr);
-
-	printf ("\e[36;1m Resolution\e[m: %dx%d\n", xwAttr.width, xwAttr.height);
-
-	XCloseDisplay( pdsp );
-
-	return 1;
-}
 
 char *fileparse(char *file, int reqline, char *regex) {
 	FILE* fp = fopen(file, "r");
@@ -85,6 +62,41 @@ char *fileopen(char *file) {
 	return result;
 	free(result);
 }
+
+int memory() {
+        struct sysinfo s_info;
+        int error = sysinfo(&s_info);
+        if(error != 0) {
+                printf("code error = %d\n", error);
+        }
+        printf("\e[36;1m Memory\e[m: %d/%d\n", ((s_info.totalram)-(s_info.freeram)),(s_info.totalram));
+}
+
+
+int header() {
+        struct passwd *pw;
+
+	char *lgn = getlogin();
+        printf("\e[36;1m %s\e[m", lgn);
+}
+
+int resolution() {
+        Display* pdsp = XOpenDisplay(NULL);
+        Window wid = DefaultRootWindow(pdsp);
+
+        Screen* pwnd = DefaultScreenOfDisplay(pdsp);
+        int sid = DefaultScreen(pdsp);
+
+        XWindowAttributes xwAttr;
+        XGetWindowAttributes(pdsp,wid,&xwAttr);
+
+        printf ("\e[36;1m Resolution\e[m: %dx%d\n", xwAttr.width, xwAttr.height);
+
+        XCloseDisplay( pdsp );
+
+        return 1;
+}
+
 
 int os() {
         struct utsname utbuffer;
@@ -183,6 +195,7 @@ int term() {
 
 
 int main(void) {
+	header();
 	os();
 	model();
 	Kernel();
