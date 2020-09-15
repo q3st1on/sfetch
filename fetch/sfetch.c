@@ -79,7 +79,8 @@ int header() {
         struct passwd *pw;
 
 	char *lgn = getlogin();
-        printf("\e[36;1m %s\e[m", lgn);
+	char *header = fileopen("/etc/hostname");
+	printf("\e[36;1m %s\e[m@\e[36;1m%s\e[m", lgn, header);
 }
 
 int resolution() {
@@ -213,6 +214,6 @@ int main(void) {
 	cpu();
 	term();
 	memory();
-    shell();
+        shell();
 	return EXIT_SUCCESS;
 }
