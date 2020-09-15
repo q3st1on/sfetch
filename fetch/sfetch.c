@@ -125,7 +125,7 @@ int packages() {
 
 int cpu() {
 	char* file = fileparse("/proc/cpuinfo", 4, "%*[^:]:%[^\n]");
-	printf("\e[36;1m CPU\e[m: %s\n", file);
+	printf("\e[36;1m CPU\e[m:%s\n", file);
 	return(0);
 }
 
