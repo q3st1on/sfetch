@@ -13,8 +13,15 @@
 #define chunk 1024
 
 
-int resolution()
-{
+int memory() {
+	struct sysinfo s_info;
+        int error = sysinfo(&s_info);
+        if(error != 0) {
+                printf("code error = %d\n", error);
+        }
+	printf("\e[36;1m Memory\e[m: %d/%d\n", ((s_info.totalram)-(s_info.freeram)),(s_info.totalram));
+}
+int resolution() {
 	Display* pdsp = XOpenDisplay(NULL);
 	Window wid = DefaultRootWindow(pdsp);
 
@@ -163,7 +170,6 @@ int packages() {
 	printf("\e[36;1m Packages\e[m: %d %s\n", packnum, "(pacman)");
 }
 
-
 int cpu() {
 	char* file = fileparse("/proc/cpuinfo", 4, "%*[^:]:%[^\n]");
 	printf("\e[36;1m CPU\e[m:%s\n", file);
@@ -185,5 +191,7 @@ int main(void) {
 	resolution();
 	cpu();
 	term();
+	memory();
+	shell();
 	return EXIT_SUCCESS;
 }
