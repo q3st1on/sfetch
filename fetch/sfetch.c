@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <X11/Xlib.h>
+#include "lib/pci.h"
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -63,6 +64,9 @@ char *fileopen(char *file) {
         }
 	return result;
 	free(result);
+}
+
+int gpu() {
 }
 
 int memory() {
@@ -213,6 +217,7 @@ int main(void) {
 	packages();
 	resolution();
 	cpu();
+	gpu();
 	term();
 	memory();
         shell();
