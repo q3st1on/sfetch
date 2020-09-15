@@ -192,6 +192,5 @@ int main(void) {
 	cpu();
 	term();
 	memory();
-	shell();
 	return EXIT_SUCCESS;
 }
