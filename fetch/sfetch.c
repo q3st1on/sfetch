@@ -74,6 +74,11 @@ int memory() {
         printf("\e[36;1m Memory\e[m: %d/%d\n", ((s_info.totalram)-(s_info.freeram)),(s_info.totalram));
 }
 
+int de() {
+  printf("\e[36;1m Desktop Environment\e[m:   %s\n", getenv("XDG_CURRENT_DESKTOP"));
+  return(0);
+
+}
 
 int header() {
         struct passwd *pw;
@@ -215,6 +220,7 @@ int main(void) {
 	cpu();
 	term();
 	memory();
-        shell();
+    shell();
+    de();
 	return EXIT_SUCCESS;
 }
