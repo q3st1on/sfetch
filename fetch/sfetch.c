@@ -7,7 +7,6 @@
 #include <errno.h>
 #include <dirent.h>
 #include <X11/Xlib.h>
-#include <pci.h>
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -65,32 +64,32 @@ char *fileopen(char *file) {
 	return result;
 	free(result);
 }
-
+/*
 int gpu() {
 struct pci_access *pacc;
   struct pci_dev *dev;
   unsigned int c;
   char namebuf[1024], *name;
 
-  pacc = pci_alloc();		/* Get the pci_access structure */
-  /* Set all options you want -- here we stick with the defaults */
-  pci_init(pacc);		/* Initialize the PCI library */
-  pci_scan_bus(pacc);		/* We want to get the list of devices */
-  for (dev=pacc->devices; dev; dev=dev->next)	/* Iterate over all devices */
+  pacc = pci_alloc();
+  pci_init(pacc);		/* Initialize the PCI library
+  pci_scan_bus(pacc);		/* We want to get the list of devices
+  for (dev=pacc->devices; dev; dev=dev->next)	/* Iterate over all devices
     {
-      pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	/* Fill in header info we need */
-      c = pci_read_byte(dev, PCI_INTERRUPT_PIN);				/* Read config register directly */
+      pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	/* Fill in header info we need /
+      c = pci_read_byte(dev, PCI_INTERRUPT_PIN);				/* Read config register directly /
       printf("%04x:%02x:%02x.%d vendor=%04x device=%04x class=%04x irq=%d (pin %d) base0=%lx",
 	     dev->domain, dev->bus, dev->dev, dev->func, dev->vendor_id, dev->device_id,
 	     dev->device_class, dev->irq, c, (long) dev->base_addr[0]);
 
-      /* Look up and print the full name of the device */
+      /* Look up and print the full name of the device *
       name = pci_lookup_name(pacc, namebuf, sizeof(namebuf), PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
       printf(" (%s)\n", name);
     }
-  pci_cleanup(pacc);		/* Close everything */
+  pci_cleanup(pacc);		/* Close everything *
   return 0;
 }
+*/
 
 int memory() {
         struct sysinfo s_info;
@@ -112,7 +111,13 @@ int header() {
 
 	char *lgn = getlogin();
 	char *header = fileopen("/etc/hostname");
-	printf("\e[36;1m %s\e[m@\e[36;1m%s\e[m", lgn, header);
+
+	char underscore[64];
+	while(strlen(underscore)<= strlen(header)) {
+		strcat(underscore, "-");
+	}
+
+	printf("\e[36;1m %s\e[m@\e[36;1m%s\e[m%s\n", lgn, header, underscore);
 }
 
 int resolution() {
@@ -219,7 +224,8 @@ int packages() {
 
 int cpu() {
 	char* file = fileparse("/proc/cpuinfo", 4, "%*[^:]:%[^\n]");
-	printf("\e[36;1m CPU\e[m:%s\n", file);
+	int* cores = sysconf(_SC_NPROCESSORS_ONLN);
+	printf("\e[36;1m CPU\e[m:%s (%d)\n", file, cores);
 	return(0);
 }
 
@@ -245,10 +251,10 @@ int main(void) {
 	packages();
 	resolution();
 	cpu();
-	gpu();
+	//gpu();
 	term();
 	memory();
-    shell();
-    de();
+	shell();
+	de();
 	return EXIT_SUCCESS;
 }
