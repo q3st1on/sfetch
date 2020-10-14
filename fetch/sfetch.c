@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <X11/Xlib.h>
-#include <pci/pci.h>
+/*#include <pci/pci.h>*/
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <pwd.h>
