@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <dirent.h>
 #include <X11/Xlib.h>
+#include <pci/pci.h>
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <pwd.h>
@@ -16,6 +17,7 @@
 #define XLIB_ILLEGAL_ACCESS
 #define _POSIX_C_SOURCE 200809L
 #define chunk 1024
+
 
 char *fileparse(char *file, int reqline, char *regex) {
 	FILE* fp = fopen(file, "r");
@@ -64,32 +66,26 @@ char *fileopen(char *file) {
 	return result;
 	free(result);
 }
-/*
-int gpu() {
-struct pci_access *pacc;
-  struct pci_dev *dev;
-  unsigned int c;
-  char namebuf[1024], *name;
 
-  pacc = pci_alloc();
-  pci_init(pacc);		/* Initialize the PCI library
-  pci_scan_bus(pacc);		/* We want to get the list of devices
-  for (dev=pacc->devices; dev; dev=dev->next)	/* Iterate over all devices
-    {
-      pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);	/* Fill in header info we need /
-      c = pci_read_byte(dev, PCI_INTERRUPT_PIN);				/* Read config register directly /
-      printf("%04x:%02x:%02x.%d vendor=%04x device=%04x class=%04x irq=%d (pin %d) base0=%lx",
-	     dev->domain, dev->bus, dev->dev, dev->func, dev->vendor_id, dev->device_id,
-	     dev->device_class, dev->irq, c, (long) dev->base_addr[0]);
-
-      /* Look up and print the full name of the device *
-      name = pci_lookup_name(pacc, namebuf, sizeof(namebuf), PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
-      printf(" (%s)\n", name);
-    }
-  pci_cleanup(pacc);		/* Close everything *
-  return 0;
-}
-*/
+/*int gpu() {
+	struct pci_access *pacc;
+	struct pci_dev *dev;
+	char namebuf[1024], *name;
+	counter = 0;
+	pacc = pci_alloc();
+	pci_init(pacc);
+	pci_scan_bus(pacc);
+	for (dev=pacc->devices; dev; dev=dev->next) {
+		if(counter == 4) {
+			pci_fill_info(dev, PCI_FILL_IDENT | PCI_FILL_BASES | PCI_FILL_CLASS);
+			name = pci_lookup_name(pacc, namebuf, sizeof(namebuf), PCI_LOOKUP_DEVICE, dev->vendor_id, dev->device_id);
+			printf("\e[36;1m GPU\e[m: %s\n", name);
+		}
+		counter++;
+	}
+	pci_cleanup(pacc);
+	return 0;
+} */
 
 int memory() {
         struct sysinfo s_info;
@@ -101,8 +97,14 @@ int memory() {
 }
 
 int de() {
-  printf("\e[36;1m Desktop Environment\e[m:   %s\n", getenv("XDG_CURRENT_DESKTOP"));
-  return(0);
+	char* de = getenv("XDG_CURRENT_DESKTOP");
+	if (de == NULL) {
+		printf("\n");
+		return(0);
+	} else {
+		printf("\e[36;1m Desktop Environment\e[m:   %s\n", de);
+		return(0);
+	}
 
 }
 
@@ -116,8 +118,8 @@ int header() {
 	while(strlen(underscore)<= strlen(header)) {
 		strcat(underscore, "-");
 	}
-
-	printf("\e[36;1m %s\e[m@\e[36;1m%s\e[m%s\n", lgn, header, underscore);
+	printf("                                          \e[36;1m %s\e[m@\e[36;1m%s\e[m", lgn, header);
+	printf("\e[36;1m                   '                       \e[m%s\n", underscore);
 }
 
 int resolution() {
@@ -224,7 +226,7 @@ int packages() {
 
 int cpu() {
 	char* file = fileparse("/proc/cpuinfo", 4, "%*[^:]:%[^\n]");
-	int* cores = sysconf(_SC_NPROCESSORS_ONLN);
+	int cores = sysconf(_SC_NPROCESSORS_ONLN);
 	printf("\e[36;1m CPU\e[m:%s (%d)\n", file, cores);
 	return(0);
 }
@@ -241,20 +243,30 @@ int shell() {
 	return(0);
 }
 
+int ascii() {
+printf("\e[36;1m                  'o'                  \e[m   ", header());
+printf("\e[36;1m                 'ooo'                 \e[m   ", os());
+printf("\e[36;1m                'ooxoo'                \e[m   ", model());
+printf("\e[36;1m               'ooxxxoo'               \e[m   ", Kernel());
+printf("\e[36;1m              'oookkxxoo'              \e[m   ", uptime());
+printf("\e[36;1m             'oiioxkkxxoo'             \e[m   ", packages());
+printf("\e[36;1m            ':;:iiiioxxxoo'            \e[m   ", resolution());
+printf("\e[36;1m               `'.;::ioxxoo'           \e[m   ", cpu());
+printf("\e[36;1m          '-.      `':;jiooo'          \e[m   ", term()); 
+printf("\e[36;1m         'oooio-..     `'i:io'         \e[m   ", memory());
+printf("\e[36;1m        'ooooxxxxoio:,.   `'-;'        \e[m   ", shell());
+printf("\e[36;1m       'ooooxxxxxkkxoooIi:-.  `'       \e[m   ", de());
+printf("\e[36;1m      'ooooxxxxxkkkkxoiiiiiji'         \e[m   \n");
+printf("\e[36;1m     'ooooxxxxxkxxoiiii:'`     .i'     \e[m   \n");
+printf("\e[36;1m    'ooooxxxxxoi:::'`       .;ioxo'    \e[m   \n");
+printf("\e[36;1m   'ooooxooi::'`         .:iiixkxxo'   \e[m   \n");
+printf("\e[36;1m  'ooooi:'`                `'';ioxxo'  \e[m   \n");
+printf("\e[36;1m 'i:'`                          '':io' \e[m   \n");
+printf("\e[36;1m'`                                   `'\e[m   \n");
+}
+
 
 int main(void) {
-	header();
-	os();
-	model();
-	Kernel();
-	uptime();
-	packages();
-	resolution();
-	cpu();
-	//gpu();
-	term();
-	memory();
-	shell();
-	de();
+	ascii();
 	return EXIT_SUCCESS;
 }
