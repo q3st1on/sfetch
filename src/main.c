@@ -45,24 +45,24 @@ char *fileparse(char *file, int reqline, char *regex) {
 }
 
 char *fileopen(char *file) {
-        FILE *filePointer ;
-        char dataToBeRead[5002];
-        filePointer = fopen( file, "r") ;
-        fseek(filePointer, 0L, SEEK_END);
-        long int res = ftell(filePointer);
-        char *result = calloc(5000, 5000);
+	FILE *filePointer ;
+	char dataToBeRead[5002];
+	filePointer = fopen( file, "r") ;
+	fseek(filePointer, 0L, SEEK_END);
+	long int res = ftell(filePointer);
+	char *result = calloc(5000, 5000);
 
-        if ( filePointer == NULL ) {
-                printf( "%s file failed to open.", file ) ;
-        }
-        else {
-                fseek(filePointer, 0, SEEK_SET);
-                while( fgets ( dataToBeRead, 50, filePointer ) != NULL ) {
-                strcat(result, dataToBeRead );
-                }
+	if ( filePointer == NULL ) {
+		printf( "%s file failed to open.", file ) ;
+	}
+	else {
+		fseek(filePointer, 0, SEEK_SET);
+		while( fgets ( dataToBeRead, 50, filePointer ) != NULL ) {
+		strcat(result, dataToBeRead );
+		}
 
-                fclose(filePointer);
-        }
+		fclose(filePointer);
+	}
 	return result;
 	free(result);
 }
@@ -88,12 +88,12 @@ char *fileopen(char *file) {
 } */
 
 int memory() {
-        struct sysinfo s_info;
-        int error = sysinfo(&s_info);
-        if(error != 0) {
-                printf("code error = %d\n", error);
-        }
-        printf("\e[36;1m Memory\e[m: %d/%d\n", ((s_info.totalram)-(s_info.freeram)),(s_info.totalram));
+	struct sysinfo s_info;
+	int error = sysinfo(&s_info);
+	if(error != 0) {
+		printf("code error = %d\n", error);
+	}
+	printf("\e[36;1m Memory\e[m: %d/%d\n", ((s_info.totalram)-(s_info.freeram)),(s_info.totalram));
 }
 
 int de() {
@@ -105,11 +105,10 @@ int de() {
 		printf("\e[36;1m Desktop Environment\e[m:   %s\n", de);
 		return(0);
 	}
-
 }
 
 int header() {
-        struct passwd *pw;
+	struct passwd *pw;
 
 	char *lgn = getlogin();
 	char *header = fileopen("/etc/hostname");
@@ -123,59 +122,57 @@ int header() {
 }
 
 int resolution() {
-        Display* pdsp = XOpenDisplay(NULL);
-        Window wid = DefaultRootWindow(pdsp);
+	Display* pdsp = XOpenDisplay(NULL);
+	Window wid = DefaultRootWindow(pdsp);
 
-        Screen* pwnd = DefaultScreenOfDisplay(pdsp);
-        int sid = DefaultScreen(pdsp);
+	Screen* pwnd = DefaultScreenOfDisplay(pdsp);
+	int sid = DefaultScreen(pdsp);
 
-        XWindowAttributes xwAttr;
-        XGetWindowAttributes(pdsp,wid,&xwAttr);
+	XWindowAttributes xwAttr;
+	XGetWindowAttributes(pdsp,wid,&xwAttr);
 
-        printf ("\e[36;1m Resolution\e[m: %dx%d\n", xwAttr.width, xwAttr.height);
+	printf ("\e[36;1m Resolution\e[m: %dx%d\n", xwAttr.width, xwAttr.height);
 
-        XCloseDisplay( pdsp );
+	XCloseDisplay( pdsp );
 
-        return 1;
+	return 1;
 }
 
 
 int os() {
-        struct utsname utbuffer;
-        errno = 0;
+	struct utsname utbuffer;
+	errno = 0;
 
+	if (uname(&utbuffer) != 0) {
+		perror("uname");
+		exit(EXIT_FAILURE);
+	}
 
-        if (uname(&utbuffer) != 0) {
-                perror("uname");
-                exit(EXIT_FAILURE);
-        }
-
-        char *result =  fileparse("/usr/lib/os-release", 1, "%*[^\"]\"%127[^\"]");
-        char *architecture = (utbuffer.machine);
-        printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat((void *) result, " ")), architecture));
+	char *result =  fileparse("/usr/lib/os-release", 1, "%*[^\"]\"%127[^\"]");
+	char *architecture = (utbuffer.machine);
+	printf("\e[36;1m OS\e[m:  %.20s\n", strcat((strcat((void *) result, " ")), architecture));
 }
 
 int model() {
-        char *name = fileopen("/sys/devices/virtual/dmi/id/product_name");
+	char *name = fileopen("/sys/devices/virtual/dmi/id/product_name");
 	char *temp;
 	temp = strchr(name,'\n');
 	*temp = '\0';
 	char *version = fileopen("/sys/devices/virtual/dmi/id/product_version");
-        char *vtemp;
-        vtemp = strchr(version,'\n');
-        *vtemp = '\0';
+	char *vtemp;
+	vtemp = strchr(version,'\n');
+	*vtemp = '\0';
 	printf("\e[36;1m Host\e[m: %s\n", strcat(strcat((void *) name, " "), (void *) version));
 }
 
 int Kernel() {
-        struct utsname utbuffer;
-        errno = 0;
+	struct utsname utbuffer;
+	errno = 0;
 
-
-        if (uname(&utbuffer) != 0) {
-                perror("uname");
-                exit(EXIT_FAILURE);
-        }
+	if (uname(&utbuffer) != 0) {
+		perror("uname");
+		exit(EXIT_FAILURE);
+	}
 
 	printf("\e[36;1m Kernel\e[m: %s\n", utbuffer.release);
 }
@@ -187,7 +184,7 @@ int uptime() {
 		printf("code error = %d\n", error);
 	}
 	int time = (s_info.uptime)/60;
-        char result[256];
+	char result[256];
 	if(time >= 60) {
 		int hourcount = 0;
 		while(time >=60) {
@@ -244,27 +241,26 @@ int shell() {
 }
 
 int ascii() {
-printf("\e[36;1m                  'o'                  \e[m   ", header());
-printf("\e[36;1m                 'ooo'                 \e[m   ", os());
-printf("\e[36;1m                'ooxoo'                \e[m   ", model());
-printf("\e[36;1m               'ooxxxoo'               \e[m   ", Kernel());
-printf("\e[36;1m              'oookkxxoo'              \e[m   ", uptime());
-printf("\e[36;1m             'oiioxkkxxoo'             \e[m   ", packages());
-printf("\e[36;1m            ':;:iiiioxxxoo'            \e[m   ", resolution());
-printf("\e[36;1m               `'.;::ioxxoo'           \e[m   ", cpu());
-printf("\e[36;1m          '-.      `':;jiooo'          \e[m   ", term()); 
-printf("\e[36;1m         'oooio-..     `'i:io'         \e[m   ", memory());
-printf("\e[36;1m        'ooooxxxxoio:,.   `'-;'        \e[m   ", shell());
-printf("\e[36;1m       'ooooxxxxxkkxoooIi:-.  `'       \e[m   ", de());
-printf("\e[36;1m      'ooooxxxxxkkkkxoiiiiiji'         \e[m   \n");
-printf("\e[36;1m     'ooooxxxxxkxxoiiii:'`     .i'     \e[m   \n");
-printf("\e[36;1m    'ooooxxxxxoi:::'`       .;ioxo'    \e[m   \n");
-printf("\e[36;1m   'ooooxooi::'`         .:iiixkxxo'   \e[m   \n");
-printf("\e[36;1m  'ooooi:'`                `'';ioxxo'  \e[m   \n");
-printf("\e[36;1m 'i:'`                          '':io' \e[m   \n");
-printf("\e[36;1m'`                                   `'\e[m   \n");
+	printf("\e[36;1m                  'o'                  \e[m   ", header());
+	printf("\e[36;1m                 'ooo'                 \e[m   ", os());
+	printf("\e[36;1m                'ooxoo'                \e[m   ", model());
+	printf("\e[36;1m               'ooxxxoo'               \e[m   ", Kernel());
+	printf("\e[36;1m              'oookkxxoo'              \e[m   ", uptime());
+	printf("\e[36;1m             'oiioxkkxxoo'             \e[m   ", packages());
+	printf("\e[36;1m            ':;:iiiioxxxoo'            \e[m   ", resolution());
+	printf("\e[36;1m               `'.;::ioxxoo'           \e[m   ", cpu());
+	printf("\e[36;1m          '-.      `':;jiooo'          \e[m   ", term()); 
+	printf("\e[36;1m         'oooio-..     `'i:io'         \e[m   ", memory());
+	printf("\e[36;1m        'ooooxxxxoio:,.   `'-;'        \e[m   ", shell());
+	printf("\e[36;1m       'ooooxxxxxkkxoooIi:-.  `'       \e[m   ", de());
+	printf("\e[36;1m      'ooooxxxxxkkkkxoiiiiiji'         \e[m   \n");
+	printf("\e[36;1m     'ooooxxxxxkxxoiiii:'`     .i'     \e[m   \n");
+	printf("\e[36;1m    'ooooxxxxxoi:::'`       .;ioxo'    \e[m   \n");
+	printf("\e[36;1m   'ooooxooi::'`         .:iiixkxxo'   \e[m   \n");
+	printf("\e[36;1m  'ooooi:'`                `'';ioxxo'  \e[m   \n");
+	printf("\e[36;1m 'i:'`                          '':io' \e[m   \n");
+	printf("\e[36;1m'`                                   `'\e[m   \n");
 }
-
 
 int main(void) {
 	ascii();
