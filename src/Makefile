@@ -1,4 +1,4 @@
 all: main
 
-main: main.c
-	gcc -lX11 main.c -o main
+main: *.cpp
+	g++ -lX11 -lXrandr *.cpp -o main -Wall -Wextra -Werror
