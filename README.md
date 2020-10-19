@@ -9,7 +9,6 @@ cool program right??
 It collects all that super usefull info in only 10.5 thousand lines of bash script
 
 so yeah, neofetch is bloated as all hell and the code base is beyond help at this point.
-To fix this issue we have started work on a c99 neofetch inspired fetch program called sfetch
 
 its like neofetch but it sucks less
 
